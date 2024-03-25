@@ -92,7 +92,7 @@ class DotRevive:
 
     # Return a constructed row string for immediate output writing.
         return (
-            "\t".join(new)
+            "\t".join(new) + "\n"
         )
                     
 
