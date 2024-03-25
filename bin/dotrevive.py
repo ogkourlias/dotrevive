@@ -36,7 +36,7 @@ class DotRevive:
                         print(f"{ctr} Variants Written.", end = "\r")
                         ctr += 1
                 else: 
-                    vcf_o.write(line)
+                    vcf_o.write(line + "\n")
                     if ctr % 10000 == 0:
                         print(f"{ctr} Variants Written.", end = "\r")
                         ctr += 1
