@@ -2,9 +2,7 @@
 
 """
     usage:
-        ./vcf_rompare.py -f [INPUT VCF FILE] -r [VCF COMPARISON FILE]
-        -ih [INPUT HEADERS TEXT FILE] -ch [COMPARISON HEADER TEXT FILE]
-        -chr [CHROMOSOME TEXT FILE] -n [CHUNKSIZE (Variant amount per run)]
+        ./dotrevive.py -i [INPUT VCF FILE] -o [OUTPUT VCF FILE]
 """
 
 # METADATA VARIABLES
@@ -36,7 +34,7 @@ class DotRevive:
                         print(f"{ctr} Variants Written.", end = "\r")
                         ctr += 1
                 else: 
-                    vcf_o.write(line + "\n")
+                    vcf_o.write(line)
                     if ctr % 10000 == 0:
                         print(f"{ctr} Variants Written.", end = "\r")
                         ctr += 1
@@ -55,12 +53,13 @@ class DotRevive:
             string: string to be written to output file.
         """
         # Get a column value for each row if header/column index is present in both files.
+        variant = variant.strip()
         variant = variant.split("\t")
         new = []
 
         for i, entry in enumerate(variant):
             match i:  # Match the index value.
-                case 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7:  # Values on these indexes are not relevant.
+                case 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 :  # Values on these indexes are not relevant.
                     new.append(entry)
 
                 case 8:  # Initialse the format column indicators/headers.
@@ -68,8 +67,8 @@ class DotRevive:
 
                     # Store format indication/header into a dictionary with empty values.
                     for ind in entry.split(":"):
-                        val_dict[ind] = "./."
-
+                        val_dict[ind] = "."
+                    
                     new.append(entry)
 
 
@@ -79,17 +78,18 @@ class DotRevive:
                         val_dict, entry.split(":")
                     ):
                         val_dict[key] = val
-
+                
                     # Save genotypes in seperate var.
                     gt = val_dict["GT"]
                     ad = val_dict["AD"]
                     sep = gt[1]
-                    if gt  == f"0{sep}0" and ad == 0:
+
+                    if gt  == f"0{sep}0" and ad == "0,0":
                         val_dict["GT"] = "./."
                     
                     new_vals = ":".join(str(dict_val) for dict_val in val_dict.values())
                     new.append(new_vals)
-
+        
     # Return a constructed row string for immediate output writing.
         return (
             "\t".join(new) + "\n"
@@ -101,7 +101,6 @@ def arg_parse():
 
     """
     Function to parse arguments.
-
     :file: Input VCF file.
     :reference: VCF file to be compared against.
     :input_header: Text file containing tab seperated headers.
